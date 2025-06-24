@@ -1,5 +1,31 @@
+let pool = ["Karambit", "AK-47", "AWP", "Deagle", "M4A1-S"];
+const itemsDiv = document.getElementById("items");
+const resultP = document.getElementById("result");
+const openBtn = document.getElementById("openBtn");
+
+let isAnimating = false;
+
+function updateNickPool() {
+  const input = document.getElementById("nickInput").value;
+  const lines = input.split("\n").map((n) => n.trim()).filter((n) => n !== "");
+  if (lines.length > 0) pool = lines;
+  alert("Zaktualizowano listę nicków!");
+}
+
+function createItemsRow() {
+  const row = [];
+  for (let i = 0; i < 30; i++) {
+    const name = pool[Math.floor(Math.random() * pool.length)];
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "item";
+    itemDiv.innerText = name;
+    row.push(itemDiv);
+  }
+  return row;
+}
+
 function openCase() {
-  if (isAnimating) return; // blokada przy wielokrotnym klikaniu
+  if (isAnimating) return;
   isAnimating = true;
   openBtn.disabled = true;
   resultP.textContent = "";
@@ -8,20 +34,14 @@ function openCase() {
   const itemsRow = createItemsRow();
   itemsRow.forEach((item) => itemsDiv.appendChild(item));
 
-  // Reset pozycji, bez animacji
   itemsDiv.style.transition = "none";
   itemsDiv.style.transform = `translateX(0)`;
 
-  // Wymuszamy repaint, żeby reset zadziałał
-  void itemsDiv.offsetWidth;
+  void itemsDiv.offsetWidth; // force repaint
 
-  // Losujemy index zwycięzcy spośród całej puli
   const offset = Math.floor(Math.random() * itemsRow.length);
-
-  // Obliczamy przesunięcie tak, aby wybrany element był wycentrowany pod wskaźnikiem
   const shift = -(offset * 110 - 250);
 
-  // Start animacji przesunięcia
   itemsDiv.style.transition = "transform 3s ease-out";
   itemsDiv.style.transform = `translateX(${shift}px)`;
 
