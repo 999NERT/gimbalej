@@ -10,61 +10,73 @@ function updateNickPool() {
   const lines = input
     .split("\n")
     .map((n) => n.trim())
-    .filter((n) => n !== "");
-  if (lines.length > 0) pool = lines;
-  alert("Zaktualizowano listę nicków!");
+    .filter((n) => n.length > 0);
+  if (lines.length > 0) {
+    pool = lines;
+    alert("Zaktualizowano listę nicków!");
+  } else {
+    alert("Lista nicków nie może być pusta!");
+  }
 }
 
 function createItemsRow() {
   const row = [];
-  for (let i = 0; i < 30; i++) {
-    const name = pool[Math.floor(Math.random() * pool.length)];
-    const itemDiv = document.createElement("div");
-    itemDiv.className = "item";
-    itemDiv.innerText = name;
-    row.push(itemDiv);
+  if (pool.length === 0) {
+    // Gdy pool pusty, wstaw elementy z tekstem 'Brak nicków'
+    for (let i = 0; i < 30; i++) {
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "item";
+      itemDiv.innerText = "Brak nicków";
+      row.push(itemDiv);
+    }
+  } else {
+    for (let i = 0; i < 30; i++) {
+      const name = pool[Math.floor(Math.random() * pool.length)];
+      const itemDiv = document.createElement("div");
+      itemDiv.className = "item";
+      itemDiv.innerText = name;
+      row.push(itemDiv);
+    }
   }
   return row;
 }
 
 function openCase() {
   if (isAnimating) return;
+
   isAnimating = true;
   openBtn.disabled = true;
   resultP.textContent = "";
 
+  // Usuń wszystkie elementy i style przed animacją
+  itemsDiv.style.transition = "none";
+  itemsDiv.style.transform = "translateX(0)";
   itemsDiv.innerHTML = "";
+  itemsDiv.style.willChange = "transform";
+
   const itemsRow = createItemsRow();
   itemsRow.forEach((item) => itemsDiv.appendChild(item));
 
-  // Reset transformacji
-  itemsDiv.style.transition = "none";
-  itemsDiv.style.transform = `translateX(0)`;
-
-  // Zapewniamy, że reset zostanie wyrenderowany zanim zacznie się animacja
+  // Wymuś repaint i zacznij animację w kolejnym frame
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      // Losujemy index zwycięzcy
-      let offset = Math.floor(Math.random() * itemsRow.length);
-
-      // Obliczamy maksymalne przesunięcie (szerokość elementów minus szerokość widocznego okna)
-      const totalWidth = itemsRow.length * 110; // 100px szerokości + 2*5px marginesu
-      const visibleWidth = 600; // szerokość kontenera
-
+      const totalWidth = itemsRow.length * 110;
+      const visibleWidth = 600;
       const maxShift = -(totalWidth - visibleWidth);
-      let shift = -(offset * 110 - visibleWidth / 2 + 55); // 55 = połowa szerokości elementu
 
-      // Ograniczamy przesunięcie, żeby nie przesunąć za bardzo w lewo lub prawo
+      let offset = Math.floor(Math.random() * itemsRow.length);
+      let shift = -(offset * 110 - visibleWidth / 2 + 55);
+
+      // Ogranicz przesunięcie w granicach
       if (shift < maxShift) shift = maxShift;
       if (shift > 0) shift = 0;
 
-      // Start animacji
       itemsDiv.style.transition = "transform 3s ease-out";
       itemsDiv.style.transform = `translateX(${shift}px)`;
 
       setTimeout(() => {
         const wonItem = itemsRow[offset];
-        if (wonItem) {
+        if (wonItem && wonItem.innerText.trim().length > 0) {
           resultP.textContent = `🎉 Wylosowano: ${wonItem.innerText}`;
         } else {
           resultP.textContent = "😞 Nic nie wylosowano!";
