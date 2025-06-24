@@ -1,6 +1,9 @@
 let pool = ["Karambit", "AK-47", "AWP", "Deagle", "M4A1-S"];
 const itemsDiv = document.getElementById("items");
 const resultP = document.getElementById("result");
+const openBtn = document.querySelector("button"); // przycisk otwierania skrzynki
+
+let isAnimating = false;
 
 function updateNickPool() {
   const input = document.getElementById("nickInput").value;
@@ -22,18 +25,33 @@ function createItemsRow() {
 }
 
 function openCase() {
+  if (isAnimating) return; // blokada wielokrotnego kliknięcia
+  isAnimating = true;
+  openBtn.disabled = true;
+  resultP.textContent = "";
+
   itemsDiv.innerHTML = "";
   const itemsRow = createItemsRow();
   itemsRow.forEach((item) => itemsDiv.appendChild(item));
 
+  // reset pozycji, bez animacji
+  itemsDiv.style.transition = "none";
+  itemsDiv.style.transform = `translateX(0)`;
+
+  // wymuszamy repaint, żeby reset zadziałał
+  void itemsDiv.offsetWidth;
+
   const offset = Math.floor(Math.random() * (itemsRow.length - 6)) + 3;
   const shift = -(offset * 110 - 250);
 
+  // uruchamiamy animację przesunięcia
   itemsDiv.style.transition = "transform 3s ease-out";
   itemsDiv.style.transform = `translateX(${shift}px)`;
 
   setTimeout(() => {
     const wonItem = itemsRow[offset];
     resultP.textContent = `🎉 Wylosowano: ${wonItem.innerText}`;
+    isAnimating = false;
+    openBtn.disabled = false;
   }, 3100);
 }
