@@ -7,7 +7,10 @@ let isAnimating = false;
 
 function updateNickPool() {
   const input = document.getElementById("nickInput").value;
-  const lines = input.split("\n").map((n) => n.trim()).filter((n) => n !== "");
+  const lines = input
+    .split("\n")
+    .map((n) => n.trim())
+    .filter((n) => n !== "");
   if (lines.length > 0) pool = lines;
   alert("Zaktualizowano listę nicków!");
 }
@@ -34,21 +37,41 @@ function openCase() {
   const itemsRow = createItemsRow();
   itemsRow.forEach((item) => itemsDiv.appendChild(item));
 
+  // Reset transformacji
   itemsDiv.style.transition = "none";
   itemsDiv.style.transform = `translateX(0)`;
 
-  void itemsDiv.offsetWidth; // force repaint
+  // Zapewniamy, że reset zostanie wyrenderowany zanim zacznie się animacja
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      // Losujemy index zwycięzcy
+      let offset = Math.floor(Math.random() * itemsRow.length);
 
-  const offset = Math.floor(Math.random() * itemsRow.length);
-  const shift = -(offset * 110 - 250);
+      // Obliczamy maksymalne przesunięcie (szerokość elementów minus szerokość widocznego okna)
+      const totalWidth = itemsRow.length * 110; // 100px szerokości + 2*5px marginesu
+      const visibleWidth = 600; // szerokość kontenera
 
-  itemsDiv.style.transition = "transform 3s ease-out";
-  itemsDiv.style.transform = `translateX(${shift}px)`;
+      const maxShift = -(totalWidth - visibleWidth);
+      let shift = -(offset * 110 - visibleWidth / 2 + 55); // 55 = połowa szerokości elementu
 
-  setTimeout(() => {
-    const wonItem = itemsRow[offset];
-    resultP.textContent = `🎉 Wylosowano: ${wonItem.innerText}`;
-    isAnimating = false;
-    openBtn.disabled = false;
-  }, 3100);
+      // Ograniczamy przesunięcie, żeby nie przesunąć za bardzo w lewo lub prawo
+      if (shift < maxShift) shift = maxShift;
+      if (shift > 0) shift = 0;
+
+      // Start animacji
+      itemsDiv.style.transition = "transform 3s ease-out";
+      itemsDiv.style.transform = `translateX(${shift}px)`;
+
+      setTimeout(() => {
+        const wonItem = itemsRow[offset];
+        if (wonItem) {
+          resultP.textContent = `🎉 Wylosowano: ${wonItem.innerText}`;
+        } else {
+          resultP.textContent = "😞 Nic nie wylosowano!";
+        }
+        isAnimating = false;
+        openBtn.disabled = false;
+      }, 3100);
+    });
+  });
 }
