@@ -1,38 +1,18 @@
-
 <!DOCTYPE html>
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Koło Losujące</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-      background: #f4f4f4;
-    }
-    canvas {
-      margin-top: 20px;
-    }
-    textarea {
-      width: 300px;
-      height: 100px;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 10px;
-    }
-  </style>
+  <title>Gimbalej</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Koło Losujące</h1>
-  <p>Wpisz imiona (jedno na linię):</p>
-  <textarea id="names"></textarea><br>
-  <button onclick="drawWheel()">Zbuduj Koło</button>
-  <button onclick="spinWheel()">Losuj!</button>
+  <header>Gimbalej</header>
+  <textarea id="names" placeholder="Wpisz imiona, jedno na linię"></textarea>
+  <div class="buttons">
+    <button onclick="drawWheel()">Zbuduj Koło</button>
+    <button onclick="spinWheel()">Losuj!</button>
+  </div>
   <canvas id="wheelCanvas" width="500" height="500"></canvas>
 
   <script>
@@ -55,12 +35,13 @@
         ctx.beginPath();
         ctx.moveTo(250, 250);
         ctx.arc(250, 250, 200, angle, angle + anglePerSlice);
-        ctx.fillStyle = i % 2 === 0 ? "#ffcc00" : "#ff6666";
+        ctx.fillStyle = i % 2 === 0 ? "#f9c74f" : "#f9844a";
         ctx.fill();
         ctx.save();
         ctx.translate(250, 250);
         ctx.rotate(angle + anglePerSlice / 2);
         ctx.fillStyle = "#000";
+        ctx.font = "16px Arial";
         ctx.fillText(names[i], 100, 5);
         ctx.restore();
       }
@@ -92,3 +73,23 @@
 
     function drawRotatedWheel() {
       const total = names.length;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < total; i++) {
+        const angle = i * anglePerSlice + currentAngle;
+        ctx.beginPath();
+        ctx.moveTo(250, 250);
+        ctx.arc(250, 250, 200, angle, angle + anglePerSlice);
+        ctx.fillStyle = i % 2 === 0 ? "#f9c74f" : "#f9844a";
+        ctx.fill();
+        ctx.save();
+        ctx.translate(250, 250);
+        ctx.rotate(angle + anglePerSlice / 2);
+        ctx.fillStyle = "#000";
+        ctx.font = "16px Arial";
+        ctx.fillText(names[i], 100, 5);
+        ctx.restore();
+      }
+    }
+  </script>
+</body>
+</html>
