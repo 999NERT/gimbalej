@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Koło Losujące</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+    textarea {
+      width: 300px;
+      height: 100px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Koło Losujące</h1>
+  <p>Wpisz imiona (jedno na linię):</p>
+  <textarea id="names"></textarea><br>
+  <button onclick="drawWheel()">Zbuduj Koło</button>
+  <button onclick="spinWheel()">Losuj!</button>
+  <canvas id="wheelCanvas" width="500" height="500"></canvas>
+
+  <script>
+    const canvas = document.getElementById("wheelCanvas");
+    const ctx = canvas.getContext("2d");
+    let names = [];
+    let anglePerSlice = 0;
+    let currentAngle = 0;
+    let spinning = false;
+
+    function drawWheel() {
+      names = document.getElementById("names").value.split("\n").filter(n => n.trim() !== "");
+      const total = names.length;
+      if (total === 0) return;
+      anglePerSlice = 2 * Math.PI / total;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let i = 0; i < total; i++) {
+        const angle = i * anglePerSlice;
+        ctx.beginPath();
+        ctx.moveTo(250, 250);
+        ctx.arc(250, 250, 200, angle, angle + anglePerSlice);
+        ctx.fillStyle = i % 2 === 0 ? "#ffcc00" : "#ff6666";
+        ctx.fill();
+        ctx.save();
+        ctx.translate(250, 250);
+        ctx.rotate(angle + anglePerSlice / 2);
+        ctx.fillStyle = "#000";
+        ctx.fillText(names[i], 100, 5);
+        ctx.restore();
+      }
+    }
+
+    function spinWheel() {
+      if (spinning || names.length === 0) return;
+      spinning = true;
+      let spinTime = 0;
+      const spinDuration = 3000;
+      const start = Date.now();
+
+      function rotate() {
+        spinTime = Date.now() - start;
+        if (spinTime >= spinDuration) {
+          const selectedIndex = Math.floor(((2 * Math.PI - currentAngle) % (2 * Math.PI)) / anglePerSlice);
+          alert("Wylosowano: " + names[selectedIndex]);
+          spinning = false;
+          return;
+        }
+        currentAngle += 0.1 + (spinDuration - spinTime) / spinDuration * 0.3;
+        currentAngle %= 2 * Math.PI;
+        drawRotatedWheel();
+        requestAnimationFrame(rotate);
+      }
+
+      rotate();
+    }
+
+    function drawRotatedWheel() {
+      const total = names.length;
