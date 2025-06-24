@@ -11,9 +11,13 @@ let animationStartTime = null;
 
 const animationDuration = 4000; // 4 sekundy
 const containerWidth = 600;
-const ITEM_WIDTH = 130 + 20; // 130px szerokości + 2*10px margines
+const ITEM_WIDTH = 130 + 20; // szerokość itema + marginesy (margin-left + margin-right = 10 + 10)
 
-// Zaktualizuj listę nicków z textarea
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+// Aktualizacja puli nicków z textarea
 function updateNickPool() {
   const raw = nickInput.value.trim();
   if (!raw) {
@@ -30,9 +34,10 @@ function updateNickPool() {
   resultP.textContent = `Załadowano ${nickPool.length} nicków. Możesz otworzyć skrzynkę!`;
 }
 
-// Tworzymy dużą listę kwadratów, powtarzając nicki aby animacja była nieskończona
+saveBtn.addEventListener("click", updateNickPool);
+
+// Tworzymy długą listę elementów do animacji (nieskończona pętla)
 function createItemsRow() {
-  // Zawsze minimum 40 elementów, by animacja nie miała pustych miejsc
   const repeatCount = Math.max(40, nickPool.length * 10);
   const items = [];
 
@@ -42,18 +47,32 @@ function createItemsRow() {
     div.textContent = nickPool[i % nickPool.length];
     items.push(div);
   }
-
   return items;
 }
 
-// Animacja przesuwania liniowo z requestAnimationFrame
+let startPosition = 0;
+let targetPosition = 0;
+
+function finishAnimation(winnerIndex) {
+  isAnimating = false;
+  openBtn.style.display = "inline-block";
+  saveBtn.disabled = false;
+  openBtn.disabled = false;
+
+  const items = itemsDiv.children;
+  let winnerNick = "Brak";
+
+  if (items[winnerIndex]) winnerNick = items[winnerIndex].textContent;
+  resultP.textContent = `🎉 Wygrał: ${winnerNick}`;
+}
+
 function animate(timestamp) {
   if (!animationStartTime) animationStartTime = timestamp;
   const elapsed = timestamp - animationStartTime;
 
   const progress = Math.min(elapsed / animationDuration, 1);
 
-  // Przesunięcie od 0 do targetPosition
+  // Obliczamy aktualne przesunięcie z easingiem
   const currentX = startPosition + (targetPosition - startPosition) * easeOutCubic(progress);
 
   itemsDiv.style.transform = `translateX(${currentX}px)`;
@@ -61,40 +80,23 @@ function animate(timestamp) {
   if (progress < 1) {
     animationFrameId = requestAnimationFrame(animate);
   } else {
-    finishAnimation();
+    // Wyliczamy index zwycięzcy na podstawie przesunięcia i szerokości itemów
+    const winnerIndex = Math.round((-targetPosition + containerWidth / 2 - ITEM_WIDTH / 2) / ITEM_WIDTH);
+    finishAnimation(winnerIndex);
   }
 }
 
-// Łagodzenie animacji (ease out cubic)
-function easeOutCubic(t) {
-  return 1 - Math.pow(1 - t, 3);
-}
-
-// Kończy animację, ustawia zwycięzcę i odblokowuje przycisk
-function finishAnimation() {
-  isAnimating = false;
-  openBtn.style.display = "inline-block";
-  saveBtn.disabled = false;
-  openBtn.disabled = false;
-
-  // Wylicz zwycięzcę na podstawie przesunięcia
-  const winnerIndex = Math.round((-targetPosition + containerWidth / 2 - ITEM_WIDTH / 2) / ITEM_WIDTH);
-  const items = itemsDiv.children;
-  let winnerNick = "Brak";
-  if (items[winnerIndex]) winnerNick = items[winnerIndex].textContent;
-
-  resultP.textContent = `🎉 Wygrał: ${winnerNick}`;
-}
-
-let startPosition = 0;
-let targetPosition = 0;
-
-// Funkcja startująca animację
 function openCase() {
   if (isAnimating) return;
   if (nickPool.length === 0) {
     alert("Najpierw wczytaj nicki klikając 'Zapisz nicki'");
     return;
+  }
+
+  // Anuluj poprzednią animację jeśli istnieje
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
   }
 
   isAnimating = true;
@@ -103,7 +105,6 @@ function openCase() {
   openBtn.disabled = true;
   resultP.textContent = "";
 
-  // Reset i ustawienie początkowej pozycji
   itemsDiv.innerHTML = "";
   itemsDiv.style.transition = "none";
   itemsDiv.style.transform = `translateX(0)`;
@@ -113,20 +114,14 @@ function openCase() {
   items.forEach(el => itemsDiv.appendChild(el));
 
   const totalItems = items.length;
-  // Losujemy zwycięzcę na pozycji od 10 do totalItems-10, żeby był bezpiecznie w środku listy
+  // Losujemy zwycięzcę od 10 do totalItems-10, by zwycięzca był po środku animacji
   const winnerIndex = Math.floor(Math.random() * (totalItems - 20)) + 10;
 
   startPosition = 0;
+  targetPosition = -(winnerIndex * ITEM_WIDTH) + (containerWidth / 2 - ITEM_WIDTH / 2);
 
-  // Wyliczamy docelowe przesunięcie tak, żeby zwycięzca znalazł się na środku
-  targetPosition = -(winnerIndex * ITEM_WIDTH - containerWidth / 2 + ITEM_WIDTH / 2);
-
-  // Anuluj ewentualne poprzednie animacje
-  if (animationFrameId) cancelAnimationFrame(animationFrameId);
-
-  // Start animacji
   animationFrameId = requestAnimationFrame(animate);
 }
 
+// Obsługa kliknięcia
 openBtn.addEventListener("click", openCase);
-saveBtn.addEventListener("click", updateNickPool);
