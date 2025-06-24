@@ -1,32 +1,59 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #0d1117; /* jak na GitHubie */
+  background-color: #0d1117;
   color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 40px;
+  padding: 40px 20px;
 }
 
 h1 {
   margin-bottom: 20px;
 }
 
-.main-layout {
-  display: flex;
-  gap: 30px;
-  margin-bottom: 20px;
+button {
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #238636;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 10px 0 5px;
+  transition: background-color 0.3s ease;
+}
+
+button:disabled {
+  background-color: #2ea043;
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background-color: #2ea043;
+}
+
+#result {
+  font-size: 18px;
+  font-weight: bold;
+  color: #238636;
+  min-height: 24px;
+  margin-bottom: 25px;
+  text-align: center;
+  width: 600px;
 }
 
 .case-container {
+  position: relative;
   width: 600px;
   height: 120px;
   overflow: hidden;
   border: 3px solid #30363d;
   background-color: #161b22;
-  position: relative;
   box-shadow: 0 0 20px #000000;
+  margin-bottom: 20px;
 }
 
 #items {
@@ -64,9 +91,10 @@ h1 {
 }
 
 .sidebar {
+  width: 600px;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
-  max-width: 250px;
 }
 
 textarea#nickInput {
@@ -79,34 +107,5 @@ textarea#nickInput {
   min-height: 150px;
   font-size: 14px;
   font-family: monospace;
-}
-
-button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #238636;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 10px;
-  transition: background-color 0.3s ease;
-}
-
-button:disabled {
-  background-color: #2ea043;
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-button:hover:not(:disabled) {
-  background-color: #2ea043;
-}
-
-#result {
-  margin-top: 20px;
-  font-size: 18px;
-  min-height: 24px;
-  font-weight: bold;
-  color: #238636;
+  margin-bottom: 10px;
 }
