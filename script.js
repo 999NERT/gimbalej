@@ -8,12 +8,12 @@ let nickPool = [];
 let isAnimating = false;
 let animationFrameId = null;
 let animationStartTime = null;
-const animationDuration = 4000; // animacja trwa 4 sekundy
-let startPosition = 0;
-let targetPosition = 0;
 
-const ITEM_WIDTH = 130 + 20; // szerokość itema + margines (width + 2 * 10px margin)
+const animationDuration = 4000; // 4 sekundy
+const containerWidth = 600;
+const ITEM_WIDTH = 130 + 20; // 130px szerokości + 2*10px margines
 
+// Zaktualizuj listę nicków z textarea
 function updateNickPool() {
   const raw = nickInput.value.trim();
   if (!raw) {
@@ -30,12 +30,13 @@ function updateNickPool() {
   resultP.textContent = `Załadowano ${nickPool.length} nicków. Możesz otworzyć skrzynkę!`;
 }
 
+// Tworzymy dużą listę kwadratów, powtarzając nicki aby animacja była nieskończona
 function createItemsRow() {
-  // Tworzymy powtarzającą się listę nicków, żeby animacja była płynna i nieskończona
-  const repeatedCount = Math.max(10, nickPool.length * 5);
+  // Zawsze minimum 40 elementów, by animacja nie miała pustych miejsc
+  const repeatCount = Math.max(40, nickPool.length * 10);
   const items = [];
 
-  for (let i = 0; i < repeatedCount; i++) {
+  for (let i = 0; i < repeatCount; i++) {
     const div = document.createElement("div");
     div.className = "item";
     div.textContent = nickPool[i % nickPool.length];
@@ -45,13 +46,15 @@ function createItemsRow() {
   return items;
 }
 
+// Animacja przesuwania liniowo z requestAnimationFrame
 function animate(timestamp) {
   if (!animationStartTime) animationStartTime = timestamp;
   const elapsed = timestamp - animationStartTime;
 
-  // Przesuwamy itemsDiv liniowo w lewo
   const progress = Math.min(elapsed / animationDuration, 1);
-  const currentX = startPosition + (targetPosition - startPosition) * progress;
+
+  // Przesunięcie od 0 do targetPosition
+  const currentX = startPosition + (targetPosition - startPosition) * easeOutCubic(progress);
 
   itemsDiv.style.transform = `translateX(${currentX}px)`;
 
@@ -62,14 +65,20 @@ function animate(timestamp) {
   }
 }
 
+// Łagodzenie animacji (ease out cubic)
+function easeOutCubic(t) {
+  return 1 - Math.pow(1 - t, 3);
+}
+
+// Kończy animację, ustawia zwycięzcę i odblokowuje przycisk
 function finishAnimation() {
   isAnimating = false;
-  openBtn.style.display = "inline-block";  // przywróć przycisk
+  openBtn.style.display = "inline-block";
   saveBtn.disabled = false;
   openBtn.disabled = false;
 
-  // Obliczamy index wygranego na podstawie docelowego przesunięcia
-  const winnerIndex = Math.round((-targetPosition + 600 / 2 - ITEM_WIDTH / 2) / ITEM_WIDTH);
+  // Wylicz zwycięzcę na podstawie przesunięcia
+  const winnerIndex = Math.round((-targetPosition + containerWidth / 2 - ITEM_WIDTH / 2) / ITEM_WIDTH);
   const items = itemsDiv.children;
   let winnerNick = "Brak";
   if (items[winnerIndex]) winnerNick = items[winnerIndex].textContent;
@@ -77,6 +86,10 @@ function finishAnimation() {
   resultP.textContent = `🎉 Wygrał: ${winnerNick}`;
 }
 
+let startPosition = 0;
+let targetPosition = 0;
+
+// Funkcja startująca animację
 function openCase() {
   if (isAnimating) return;
   if (nickPool.length === 0) {
@@ -85,41 +98,24 @@ function openCase() {
   }
 
   isAnimating = true;
-  openBtn.style.display = "none";  // schowaj przycisk podczas animacji
+  openBtn.style.display = "none";
   saveBtn.disabled = true;
   openBtn.disabled = true;
   resultP.textContent = "";
 
-  // Wyczyść i ustaw początkową pozycję
+  // Reset i ustawienie początkowej pozycji
   itemsDiv.innerHTML = "";
   itemsDiv.style.transition = "none";
-  itemsDiv.style.transform = "translateX(0)";
+  itemsDiv.style.transform = `translateX(0)`;
   animationStartTime = null;
 
   const items = createItemsRow();
   items.forEach(el => itemsDiv.appendChild(el));
 
-  // Losujemy zwycięzcę (index w powtarzającej się liście)
   const totalItems = items.length;
-  const winnerIndex = Math.floor(Math.random() * totalItems);
+  // Losujemy zwycięzcę na pozycji od 10 do totalItems-10, żeby był bezpiecznie w środku listy
+  const winnerIndex = Math.floor(Math.random() * (totalItems - 20)) + 10;
 
-  // startPosition to 0 (pozycja początkowa)
   startPosition = 0;
 
-  // targetPosition przesuwamy tak, aby zwycięzca był na środku
-  const containerCenter = 600 / 2;
-  targetPosition = -(winnerIndex * ITEM_WIDTH - containerCenter + ITEM_WIDTH / 2);
-
-  // Anuluj poprzednią animację, jeśli istnieje
-  if (animationFrameId) {
-    cancelAnimationFrame(animationFrameId);
-    animationFrameId = null;
-  }
-
-  // Start animacji
-  animationFrameId = requestAnimationFrame(animate);
-}
-
-// Eventy
-saveBtn.addEventListener("click", updateNickPool);
-openBtn.addEventListener("click", openCase);
+  // Wyliczamy docelowe przesunięcie tak, żeby zwycięzca znalazł się na środku
