@@ -1,63 +1,85 @@
-const itemsTrack = document.getElementById("items");
+const itemsDiv = document.getElementById("items");
 const openBtn = document.getElementById("openBtn");
-const input = document.getElementById("nicknameInput");
+const nickInput = document.getElementById("nickInput");
 const resultP = document.getElementById("result");
 
+let nickPool = [];
 let isAnimating = false;
 
-function getRandomName() {
-  const names = ["Karambit", "AWP", "AK-47", "M4A1", "Glock", "USP-S", "P250"];
-  return names[Math.floor(Math.random() * names.length)];
+function updateNickPool() {
+  const raw = nickInput.value.trim();
+  if (!raw) {
+    alert("Wpisz przynajmniej jeden nick.");
+    return;
+  }
+  // Pobierz nicki z textarea, jeden na linię, bez pustych
+  nickPool = raw.split("\n").map(n => n.trim()).filter(n => n.length > 0);
+
+  if (nickPool.length === 0) {
+    alert("Wpisz przynajmniej jeden poprawny nick.");
+    return;
+  }
+
+  resultP.textContent = `Załadowano ${nickPool.length} nicków. Możesz otworzyć skrzynkę!`;
 }
 
-function createItemsRow(nickname) {
+function createItemsRow() {
+  // Stwórz wystarczająco dużo elementów na całą animację
+  // Powiel nicki kilkukrotnie, żeby efekt był płynny
+  const multiplier = 10;
   const items = [];
-  const totalItems = 30;
-  const winnerIndex = Math.floor(Math.random() * (totalItems - 10)) + 5;
 
-  for (let i = 0; i < totalItems; i++) {
+  for (let i = 0; i < nickPool.length * multiplier; i++) {
     const div = document.createElement("div");
     div.className = "item";
-    div.textContent = i === winnerIndex ? nickname : getRandomName();
+    div.textContent = nickPool[i % nickPool.length];
     items.push(div);
   }
 
-  return { items, winnerIndex };
+  return items;
 }
 
 function openCase() {
   if (isAnimating) return;
 
+  if (nickPool.length === 0) {
+    alert("Najpierw wczytaj nicki klikając 'Zapisz nicki'");
+    return;
+  }
+
   isAnimating = true;
-  resultP.textContent = "";
-
-  const nickname = input.value.trim() || "Anonim";
-
   openBtn.disabled = true;
-  openBtn.classList.add("hidden");
+  resultP.textContent = "";
+  itemsDiv.style.transition = "none";
+  itemsDiv.style.transform = "translateX(0)";
+  itemsDiv.innerHTML = "";
 
-  itemsTrack.innerHTML = "";
-  itemsTrack.style.transition = "none";
-  itemsTrack.style.transform = "translateX(0)";
+  const items = createItemsRow();
+  items.forEach(el => itemsDiv.appendChild(el));
 
-  const { items, winnerIndex } = createItemsRow(nickname);
-  items.forEach((el) => itemsTrack.appendChild(el));
+  // Wybierz losowy index zwycięzcy w środku "ekranu"
+  const visibleWidth = 600; // szerokość kontenera
+  const itemWidth = 120; // item + margin
+  const totalItems = items.length;
 
-  // Poczekaj sekundę, zanim uruchomisz animację
+  // Random index w środkowym zakresie aby zwycięzca był w środku
+  // losujemy index od 5 do totalItems-5, żeby animacja nie wychodziła poza elementy
+  const winnerIndex = Math.floor(Math.random() * (totalItems - 10)) + 5;
+
+  // Obliczamy przesunięcie tak, aby wybrany element był na środku
+  const shift = -(winnerIndex * itemWidth - visibleWidth / 2 + itemWidth / 2);
+
+  // Małe opóźnienie przed animacją (np 1s)
   setTimeout(() => {
-    const shift = -(winnerIndex * 120 - 600 / 2 + 60);
-
-    itemsTrack.style.transition = "transform 3s ease-out";
-    itemsTrack.style.transform = `translateX(${shift}px)`;
-
-    setTimeout(() => {
-      const won = items[winnerIndex]?.textContent || "nic";
-      resultP.textContent = `🎉 Wylosowano: ${won}`;
-      openBtn.disabled = false;
-      openBtn.classList.remove("hidden");
-      isAnimating = false;
-    }, 3100);
+    itemsDiv.style.transition = "transform 3s ease-out";
+    itemsDiv.style.transform = `translateX(${shift}px)`;
   }, 1000);
-}
 
-openBtn.addEventListener("click", openCase);
+  // Po animacji pokazujemy wynik
+  setTimeout(() => {
+    const winner = items[winnerIndex].textContent;
+    resultP.textContent = `🎉 Wygrał: ${winner}`;
+    isAnimating = false;
+    openBtn.disabled = false;
+  }, 4200);
+}
