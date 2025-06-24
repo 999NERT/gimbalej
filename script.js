@@ -119,3 +119,14 @@ function openCase() {
   startPosition = 0;
 
   // Wyliczamy docelowe przesunięcie tak, żeby zwycięzca znalazł się na środku
+  targetPosition = -(winnerIndex * ITEM_WIDTH - containerWidth / 2 + ITEM_WIDTH / 2);
+
+  // Anuluj ewentualne poprzednie animacje
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+  // Start animacji
+  animationFrameId = requestAnimationFrame(animate);
+}
+
+openBtn.addEventListener("click", openCase);
+saveBtn.addEventListener("click", updateNickPool);
