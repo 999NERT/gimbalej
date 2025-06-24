@@ -24,7 +24,7 @@ function updateNickPool() {
 }
 
 function createItemsRow() {
-  const multiplier = 10; // ile razy nicki się powtarzają by zrobić animację dłuższą
+  const multiplier = 10; // aby animacja była dłuższa
   const items = [];
 
   for (let i = 0; i < nickPool.length * multiplier; i++) {
@@ -60,25 +60,24 @@ function openCase() {
   const itemWidth = 120;
   const totalItems = items.length;
 
-  // Losujemy indeks zwycięzcy gdzieś na środku animacji, z marginesem aby nie było problemów z przesunięciem
+  // Losujemy zwycięzcę, żeby był w środku animacji
   const winnerIndex = Math.floor(Math.random() * (totalItems - 10)) + 5;
 
-  // Obliczamy przesunięcie by wyróżnić zwycięski element na środku widoku
+  // Przesunięcie, aby wyróżnić zwycięskiego nicka na środku kontenera
   let shift = -(winnerIndex * itemWidth - visibleWidth / 2 + itemWidth / 2);
 
-  // Ograniczamy przesunięcie, by nie przesunąć za bardzo na skraj
+  // Ograniczenie przesunięcia
   const maxShift = -(totalItems * itemWidth - visibleWidth);
   if (shift < maxShift) shift = maxShift;
   if (shift > 0) shift = 0;
 
-  // Małe opóźnienie żeby resetować transformację (potrzebne do restartu animacji)
+  // Reset transformacji przed animacją i wymuszenie reflow
   setTimeout(() => {
     itemsDiv.style.transition = "none";
     itemsDiv.style.transform = "translateX(0)";
-    // Wymuszamy reflow, by transition zadziałał poprawnie
     void itemsDiv.offsetWidth;
 
-    // Ustawiamy właściwą animację
+    // Uruchom animację przesunięcia
     itemsDiv.style.transition = "transform 3s ease-out";
     itemsDiv.style.transform = `translateX(${shift}px)`;
   }, 50);
@@ -92,6 +91,6 @@ function openCase() {
   }, 3200);
 }
 
-// Podłączamy eventy
+// Eventy
 saveBtn.addEventListener("click", updateNickPool);
 openBtn.addEventListener("click", openCase);
