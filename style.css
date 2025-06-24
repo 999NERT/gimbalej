@@ -1,9 +1,11 @@
 body {
-  font-family: sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   background-color: #0d1117;
   color: white;
   text-align: center;
   padding: 2rem;
+  margin: 0;
 }
 
 h1 {
@@ -16,6 +18,8 @@ h1 {
   align-items: flex-start;
   gap: 40px;
   flex-wrap: wrap;
+  max-width: 900px;
+  margin: 0 auto 2rem;
 }
 
 .case-container {
@@ -25,6 +29,7 @@ h1 {
   overflow: hidden;
   border: 4px solid #30363d;
   background-color: #161b22;
+  margin: 0 auto;
 }
 
 .items {
@@ -42,12 +47,13 @@ h1 {
   background-color: #21262d;
   border: 2px solid #30363d;
   margin: 0 5px;
-  font-weight: bold;
+  font-weight: 600;
   font-size: 14px;
   color: #c9d1d9;
   text-align: center;
   padding: 5px;
   box-sizing: border-box;
+  user-select: none;
 }
 
 .pointer {
@@ -56,3 +62,67 @@ h1 {
   left: 50%;
   transform: translateX(-50%);
   width: 4px;
+  height: 100%;
+  background-color: red;
+  z-index: 10;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #161b22;
+  padding: 1rem;
+  border: 2px solid #30363d;
+  border-radius: 8px;
+  max-width: 250px;
+  width: 100%;
+}
+
+.sidebar h2 {
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+textarea#nickInput {
+  width: 100%;
+  height: 200px;
+  padding: 12px 16px;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  border: 2px solid #30363d;
+  background-color: #0d1117;
+  color: white;
+  resize: none;
+  box-shadow: inset 0 0 8px #21262d;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+textarea#nickInput::placeholder {
+  color: #8b949e;
+  font-weight: 500;
+}
+
+button {
+  padding: 12px 20px;
+  background-color: #238636;
+  border: none;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 20px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2ea043;
+}
+
+#result {
+  margin-top: 1rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+  min-height: 1.5rem;
+}
