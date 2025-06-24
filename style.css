@@ -64,7 +64,7 @@ button:hover:not(:disabled) {
 }
 
 .item {
-  width: 130px;  /* trochę szersze */
+  width: 130px;
   height: 100px;
   margin: 10px;
   background-color: #21262d;
