@@ -1,73 +1,53 @@
-let pool = ["Karambit", "AK-47", "AWP", "Deagle", "M4A1-S"];
 const itemsDiv = document.getElementById("items");
-const resultP = document.getElementById("result");
 const openBtn = document.getElementById("openBtn");
+const input = document.getElementById("nicknameInput");
+const resultP = document.getElementById("result");
 
 let isAnimating = false;
 
-function updateNickPool() {
-  const input = document.getElementById("nickInput").value;
-  const lines = input
-    .split("\n")
-    .map((n) => n.trim())
-    .filter((n) => n.length > 0);
-  if (lines.length > 0) {
-    pool = lines;
-    alert("Zaktualizowano listę nicków!");
-  } else {
-    alert("Lista nicków nie może być pusta!");
-  }
+function getRandomName() {
+  const names = ["Karambit", "AWP", "AK-47", "M4A1", "Glock", "USP-S", "P250"];
+  return names[Math.floor(Math.random() * names.length)];
 }
 
-function createItemsRow() {
-  const row = [];
-  if (pool.length === 0) {
-    // Gdy pool pusty, wstaw elementy z tekstem 'Brak nicków'
-    for (let i = 0; i < 30; i++) {
-      const itemDiv = document.createElement("div");
-      itemDiv.className = "item";
-      itemDiv.innerText = "Brak nicków";
-      row.push(itemDiv);
-    }
-  } else {
-    for (let i = 0; i < 30; i++) {
-      const name = pool[Math.floor(Math.random() * pool.length)];
-      const itemDiv = document.createElement("div");
-      itemDiv.className = "item";
-      itemDiv.innerText = name;
-      row.push(itemDiv);
-    }
+function createItemsRow(nickname) {
+  const items = [];
+  const totalItems = 20;
+  const winnerIndex = Math.floor(Math.random() * totalItems);
+
+  for (let i = 0; i < totalItems; i++) {
+    const div = document.createElement("div");
+    div.className = "item";
+    div.textContent = i === winnerIndex ? nickname : getRandomName();
+    items.push(div);
   }
-  return row;
+
+  return { items, winnerIndex };
 }
 
 function openCase() {
   if (isAnimating) return;
 
   isAnimating = true;
-  openBtn.disabled = true;
+  openBtn.classList.add("hidden");
   resultP.textContent = "";
 
-  // Usuń wszystkie elementy i style przed animacją
+  const nickname = input.value.trim() || "Anonim";
+
+  itemsDiv.innerHTML = "";
   itemsDiv.style.transition = "none";
   itemsDiv.style.transform = "translateX(0)";
-  itemsDiv.innerHTML = "";
-  itemsDiv.style.willChange = "transform";
 
-  const itemsRow = createItemsRow();
-  itemsRow.forEach((item) => itemsDiv.appendChild(item));
+  const { items, winnerIndex } = createItemsRow(nickname);
+  items.forEach((el) => itemsDiv.appendChild(el));
 
-  // Wymuś repaint i zacznij animację w kolejnym frame
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
-      const totalWidth = itemsRow.length * 110;
+      const totalWidth = items.length * 120;
       const visibleWidth = 600;
+      let shift = -(winnerIndex * 120 - visibleWidth / 2 + 60);
       const maxShift = -(totalWidth - visibleWidth);
 
-      let offset = Math.floor(Math.random() * itemsRow.length);
-      let shift = -(offset * 110 - visibleWidth / 2 + 55);
-
-      // Ogranicz przesunięcie w granicach
       if (shift < maxShift) shift = maxShift;
       if (shift > 0) shift = 0;
 
@@ -75,15 +55,15 @@ function openCase() {
       itemsDiv.style.transform = `translateX(${shift}px)`;
 
       setTimeout(() => {
-        const wonItem = itemsRow[offset];
-        if (wonItem && wonItem.innerText.trim().length > 0) {
-          resultP.textContent = `🎉 Wylosowano: ${wonItem.innerText}`;
-        } else {
-          resultP.textContent = "😞 Nic nie wylosowano!";
-        }
+        const won = items[winnerIndex]?.textContent || "nic";
+        resultP.textContent = `🎉 Wylosowano: ${won}`;
         isAnimating = false;
-        openBtn.disabled = false;
+        openBtn.classList.remove("hidden");
       }, 3100);
     });
   });
 }
+
+openBtn.addEventListener("click", () => {
+  setTimeout(openCase, 1000); // opóźnienie 1 sekunda
+});
