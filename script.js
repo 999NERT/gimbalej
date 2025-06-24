@@ -4,7 +4,7 @@ const resultP = document.getElementById("result");
 
 function updateNickPool() {
   const input = document.getElementById("nickInput").value;
-  const lines = input.split("\n").map(n => n.trim()).filter(n => n !== "");
+  const lines = input.split("\n").map((n) => n.trim()).filter((n) => n !== "");
   if (lines.length > 0) pool = lines;
   alert("Zaktualizowano listę nicków!");
 }
@@ -24,7 +24,7 @@ function createItemsRow() {
 function openCase() {
   itemsDiv.innerHTML = "";
   const itemsRow = createItemsRow();
-  itemsRow.forEach(item => itemsDiv.appendChild(item));
+  itemsRow.forEach((item) => itemsDiv.appendChild(item));
 
   const offset = Math.floor(Math.random() * (itemsRow.length - 6)) + 3;
   const shift = -(offset * 110 - 250);
@@ -37,4 +37,3 @@ function openCase() {
     resultP.textContent = `🎉 Wylosowano: ${wonItem.innerText}`;
   }, 3100);
 }
-
