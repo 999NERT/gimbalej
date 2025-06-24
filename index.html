@@ -2,25 +2,23 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CS:GO Case</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Otwieranie Skrzynek</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Otwieranie skrzynki CS:5</h1>
-  <div class="main-layout">
-    <div class="case-container">
-      <div class="items" id="items"></div>
-      <div class="pointer"></div>
+  <div class="container">
+    <h1>Symulator skrzynek</h1>
+    <input type="text" id="nicknameInput" placeholder="Wpisz nick..." />
+
+    <div id="items-container">
+      <div id="items"></div>
     </div>
-    <div class="sidebar">
-      <h2>Wpisz nicki (jeden na linię)</h2>
-      <textarea id="nickInput" placeholder="Wpisz nicki, jeden na linię..."></textarea>
-      <button onclick="updateNickPool()">Zapisz nicki</button>
-    </div>
+
+    <button id="openBtn">Otwórz skrzynkę</button>
+    <p id="result"></p>
+    <p class="update-info">UPDATE: 1.06</p>
   </div>
-  <button id="openBtn" onclick="openCase()">Otwórz skrzynkę</button>
-  <p id="result"></p>
 
   <script src="script.js"></script>
 </body>
