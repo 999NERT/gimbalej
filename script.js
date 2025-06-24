@@ -6,6 +6,13 @@ const resultP = document.getElementById("result");
 
 let nickPool = [];
 let isAnimating = false;
+let animationFrameId = null;
+let animationStartTime = null;
+const animationDuration = 4000; // animacja trwa 4 sekundy
+let startPosition = 0;
+let targetPosition = 0;
+
+const ITEM_WIDTH = 130 + 20; // szerokość itema + margines (width + 2 * 10px margin)
 
 function updateNickPool() {
   const raw = nickInput.value.trim();
@@ -24,10 +31,11 @@ function updateNickPool() {
 }
 
 function createItemsRow() {
-  const multiplier = 10; // aby animacja była dłuższa
+  // Tworzymy powtarzającą się listę nicków, żeby animacja była płynna i nieskończona
+  const repeatedCount = Math.max(10, nickPool.length * 5);
   const items = [];
 
-  for (let i = 0; i < nickPool.length * multiplier; i++) {
+  for (let i = 0; i < repeatedCount; i++) {
     const div = document.createElement("div");
     div.className = "item";
     div.textContent = nickPool[i % nickPool.length];
@@ -35,6 +43,38 @@ function createItemsRow() {
   }
 
   return items;
+}
+
+function animate(timestamp) {
+  if (!animationStartTime) animationStartTime = timestamp;
+  const elapsed = timestamp - animationStartTime;
+
+  // Przesuwamy itemsDiv liniowo w lewo
+  const progress = Math.min(elapsed / animationDuration, 1);
+  const currentX = startPosition + (targetPosition - startPosition) * progress;
+
+  itemsDiv.style.transform = `translateX(${currentX}px)`;
+
+  if (progress < 1) {
+    animationFrameId = requestAnimationFrame(animate);
+  } else {
+    finishAnimation();
+  }
+}
+
+function finishAnimation() {
+  isAnimating = false;
+  openBtn.style.display = "inline-block";  // przywróć przycisk
+  saveBtn.disabled = false;
+  openBtn.disabled = false;
+
+  // Obliczamy index wygranego na podstawie docelowego przesunięcia
+  const winnerIndex = Math.round((-targetPosition + 600 / 2 - ITEM_WIDTH / 2) / ITEM_WIDTH);
+  const items = itemsDiv.children;
+  let winnerNick = "Brak";
+  if (items[winnerIndex]) winnerNick = items[winnerIndex].textContent;
+
+  resultP.textContent = `🎉 Wygrał: ${winnerNick}`;
 }
 
 function openCase() {
@@ -45,50 +85,39 @@ function openCase() {
   }
 
   isAnimating = true;
-  openBtn.disabled = true;
+  openBtn.style.display = "none";  // schowaj przycisk podczas animacji
   saveBtn.disabled = true;
+  openBtn.disabled = true;
   resultP.textContent = "";
 
+  // Wyczyść i ustaw początkową pozycję
+  itemsDiv.innerHTML = "";
   itemsDiv.style.transition = "none";
   itemsDiv.style.transform = "translateX(0)";
-  itemsDiv.innerHTML = "";
+  animationStartTime = null;
 
   const items = createItemsRow();
   items.forEach(el => itemsDiv.appendChild(el));
 
-  const visibleWidth = 600;
-  const itemWidth = 120;
+  // Losujemy zwycięzcę (index w powtarzającej się liście)
   const totalItems = items.length;
+  const winnerIndex = Math.floor(Math.random() * totalItems);
 
-  // Losujemy zwycięzcę, żeby był w środku animacji
-  const winnerIndex = Math.floor(Math.random() * (totalItems - 10)) + 5;
+  // startPosition to 0 (pozycja początkowa)
+  startPosition = 0;
 
-  // Przesunięcie, aby wyróżnić zwycięskiego nicka na środku kontenera
-  let shift = -(winnerIndex * itemWidth - visibleWidth / 2 + itemWidth / 2);
+  // targetPosition przesuwamy tak, aby zwycięzca był na środku
+  const containerCenter = 600 / 2;
+  targetPosition = -(winnerIndex * ITEM_WIDTH - containerCenter + ITEM_WIDTH / 2);
 
-  // Ograniczenie przesunięcia
-  const maxShift = -(totalItems * itemWidth - visibleWidth);
-  if (shift < maxShift) shift = maxShift;
-  if (shift > 0) shift = 0;
+  // Anuluj poprzednią animację, jeśli istnieje
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
 
-  // Reset transformacji przed animacją i wymuszenie reflow
-  setTimeout(() => {
-    itemsDiv.style.transition = "none";
-    itemsDiv.style.transform = "translateX(0)";
-    void itemsDiv.offsetWidth;
-
-    // Uruchom animację przesunięcia
-    itemsDiv.style.transition = "transform 3s ease-out";
-    itemsDiv.style.transform = `translateX(${shift}px)`;
-  }, 50);
-
-  setTimeout(() => {
-    const winner = items[winnerIndex].textContent;
-    resultP.textContent = `🎉 Wygrał: ${winner}`;
-    isAnimating = false;
-    openBtn.disabled = false;
-    saveBtn.disabled = false;
-  }, 3200);
+  // Start animacji
+  animationFrameId = requestAnimationFrame(animate);
 }
 
 // Eventy
