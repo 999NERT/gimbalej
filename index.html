@@ -8,9 +8,16 @@
 </head>
 <body>
   <h1>Otwieranie skrzynki CS:GO</h1>
-  <div class="case-container">
-    <div class="items" id="items"></div>
-    <div class="pointer"></div>
+  <div class="main-layout">
+    <div class="case-container">
+      <div class="items" id="items"></div>
+      <div class="pointer"></div>
+    </div>
+    <div class="sidebar">
+      <h2>Dodaj nicki</h2>
+      <textarea id="nickInput" placeholder="Wpisz nicki, jeden na linię"></textarea>
+      <button onclick="updateNickPool()">Zapisz nicki</button>
+    </div>
   </div>
   <button onclick="openCase()">Otwórz skrzynkę</button>
   <p id="result"></p>
