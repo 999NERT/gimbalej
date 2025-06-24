@@ -1,63 +1,108 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #0d1117;
-  color: #ffffff;
+  background-color: #0d1117; /* GitHub style */
+  color: #fff;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 40px;
+  padding: 20px;
+  min-height: 100vh;
 }
 
-.container {
-  text-align: center;
+h1, h2 {
+  margin: 10px 0;
 }
 
-#items-container {
-  margin: 30px 0;
-  width: 600px;
+.main-layout {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 900px;
+}
+
+.case-container {
+  position: relative;
+  flex: 1;
   height: 120px;
   overflow: hidden;
   border: 3px solid #30363d;
   background-color: #161b22;
-  position: relative;
   box-shadow: 0 0 20px #000000;
+  border-radius: 8px;
 }
 
-#items-track {
-  width: max-content;
-}
-
-#items {
+.items {
   display: flex;
   height: 100%;
   will-change: transform;
+  transition: transform 3s ease-out;
+  user-select: none;
 }
 
 .item {
+  flex-shrink: 0;
   width: 100px;
   height: 100px;
   margin: 10px;
   background-color: #21262d;
   border: 2px solid #444c56;
+  border-radius: 8px;
+  box-shadow: inset 0 0 5px #000;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  border-radius: 8px;
-  box-shadow: inset 0 0 5px #000;
-  flex-shrink: 0;
+  font-size: 14px;
+  text-align: center;
+}
+
+.pointer {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; 
+  height: 0; 
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 30px solid #238636; /* zielony jak przycisk */
+}
+
+.sidebar {
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+}
+
+textarea#nickInput {
+  width: 100%;
+  height: 180px;
+  background-color: #0d1117;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #fff;
+  padding: 10px;
+  resize: vertical;
+  font-size: 14px;
+  font-family: monospace, monospace;
 }
 
 button {
-  padding: 10px 20px;
-  font-size: 16px;
+  margin-top: 15px;
+  padding: 10px;
   background-color: #238636;
-  color: white;
   border: none;
   border-radius: 6px;
+  color: white;
+  font-size: 16px;
   cursor: pointer;
-  margin-top: 10px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover:not(:disabled) {
+  background-color: #2ea043;
 }
 
 button:disabled {
@@ -66,29 +111,15 @@ button:disabled {
   cursor: not-allowed;
 }
 
-.hidden {
-  display: none;
-}
-
-input {
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #30363d;
-  background-color: #0d1117;
-  color: #ffffff;
-  margin-top: 20px;
+#openBtn {
   width: 200px;
-  text-align: center;
 }
 
 #result {
   margin-top: 20px;
   font-size: 18px;
   font-weight: bold;
-}
-
-.update-info {
-  font-size: 12px;
-  margin-top: 20px;
-  color: #8b949e;
+  min-height: 24px;
+  color: #58a6ff;
+  text-align: center;
 }
