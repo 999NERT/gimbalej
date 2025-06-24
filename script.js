@@ -11,13 +11,12 @@ let animationStartTime = null;
 
 const animationDuration = 4000; // 4 sekundy
 const containerWidth = 600;
-const ITEM_WIDTH = 130 + 20; // szerokość itema + marginesy (margin-left + margin-right = 10 + 10)
+const ITEM_WIDTH = 130 + 20; // szerokość itema + marginesy
 
 function easeOutCubic(t) {
   return 1 - Math.pow(1 - t, 3);
 }
 
-// Aktualizacja puli nicków z textarea
 function updateNickPool() {
   const raw = nickInput.value.trim();
   if (!raw) {
@@ -36,7 +35,6 @@ function updateNickPool() {
 
 saveBtn.addEventListener("click", updateNickPool);
 
-// Tworzymy długą listę elementów do animacji (nieskończona pętla)
 function createItemsRow() {
   const repeatCount = Math.max(40, nickPool.length * 10);
   const items = [];
@@ -72,7 +70,6 @@ function animate(timestamp) {
 
   const progress = Math.min(elapsed / animationDuration, 1);
 
-  // Obliczamy aktualne przesunięcie z easingiem
   const currentX = startPosition + (targetPosition - startPosition) * easeOutCubic(progress);
 
   itemsDiv.style.transform = `translateX(${currentX}px)`;
@@ -80,8 +77,8 @@ function animate(timestamp) {
   if (progress < 1) {
     animationFrameId = requestAnimationFrame(animate);
   } else {
-    // Wyliczamy index zwycięzcy na podstawie przesunięcia i szerokości itemów
-    const winnerIndex = Math.round((-targetPosition + containerWidth / 2 - ITEM_WIDTH / 2) / ITEM_WIDTH);
+    // Zatrzymujemy animację na pierwszym nicku (index 0)
+    const winnerIndex = 0;
     finishAnimation(winnerIndex);
   }
 }
@@ -93,7 +90,6 @@ function openCase() {
     return;
   }
 
-  // Anuluj poprzednią animację jeśli istnieje
   if (animationFrameId) {
     cancelAnimationFrame(animationFrameId);
     animationFrameId = null;
@@ -114,14 +110,12 @@ function openCase() {
   items.forEach(el => itemsDiv.appendChild(el));
 
   const totalItems = items.length;
-  // Losujemy zwycięzcę od 10 do totalItems-10, by zwycięzca był po środku animacji
-  const winnerIndex = Math.floor(Math.random() * (totalItems - 20)) + 10;
 
+  // Zatrzymujemy animację na pierwszym nicku (indeks 0)
   startPosition = 0;
-  targetPosition = -(winnerIndex * ITEM_WIDTH) + (containerWidth / 2 - ITEM_WIDTH / 2);
+  targetPosition = -(0 * ITEM_WIDTH) + (containerWidth / 2 - ITEM_WIDTH / 2);
 
   animationFrameId = requestAnimationFrame(animate);
 }
 
-// Obsługa kliknięcia
 openBtn.addEventListener("click", openCase);
