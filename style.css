@@ -59,12 +59,12 @@ button:hover:not(:disabled) {
 #items {
   display: flex;
   height: 100%;
-  transition: transform 3s ease-out;
   will-change: transform;
+  /* transition usunięte, bo animacja robiona inaczej */
 }
 
 .item {
-  width: 100px;
+  width: 130px;  /* trochę szersze */
   height: 100px;
   margin: 10px;
   background-color: #21262d;
