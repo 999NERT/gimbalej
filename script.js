@@ -1,4 +1,4 @@
-const itemsDiv = document.getElementById("items");
+const itemsTrack = document.getElementById("items");
 const openBtn = document.getElementById("openBtn");
 const input = document.getElementById("nicknameInput");
 const resultP = document.getElementById("result");
@@ -12,8 +12,8 @@ function getRandomName() {
 
 function createItemsRow(nickname) {
   const items = [];
-  const totalItems = 20;
-  const winnerIndex = Math.floor(Math.random() * totalItems);
+  const totalItems = 30;
+  const winnerIndex = Math.floor(Math.random() * (totalItems - 10)) + 5;
 
   for (let i = 0; i < totalItems; i++) {
     const div = document.createElement("div");
@@ -35,24 +35,20 @@ function openCase() {
 
   openBtn.disabled = true;
   openBtn.classList.add("hidden");
-  itemsDiv.innerHTML = "";
-  itemsDiv.style.transition = "none";
-  itemsDiv.style.transform = "translateX(0)";
+
+  itemsTrack.innerHTML = "";
+  itemsTrack.style.transition = "none";
+  itemsTrack.style.transform = "translateX(0)";
 
   const { items, winnerIndex } = createItemsRow(nickname);
-  items.forEach((el) => itemsDiv.appendChild(el));
+  items.forEach((el) => itemsTrack.appendChild(el));
 
+  // Poczekaj sekundę, zanim uruchomisz animację
   setTimeout(() => {
-    const totalWidth = items.length * 120;
-    const visibleWidth = 600;
-    let shift = -(winnerIndex * 120 - visibleWidth / 2 + 60);
-    const maxShift = -(totalWidth - visibleWidth);
+    const shift = -(winnerIndex * 120 - 600 / 2 + 60);
 
-    if (shift < maxShift) shift = maxShift;
-    if (shift > 0) shift = 0;
-
-    itemsDiv.style.transition = "transform 3s ease-out";
-    itemsDiv.style.transform = `translateX(${shift}px)`;
+    itemsTrack.style.transition = "transform 3s ease-out";
+    itemsTrack.style.transform = `translateX(${shift}px)`;
 
     setTimeout(() => {
       const won = items[winnerIndex]?.textContent || "nic";
@@ -61,7 +57,7 @@ function openCase() {
       openBtn.classList.remove("hidden");
       isAnimating = false;
     }, 3100);
-  }, 1000); // 1s delay before animation starts
+  }, 1000);
 }
 
 openBtn.addEventListener("click", openCase);
