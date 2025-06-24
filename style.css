@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #0d1117; /* jak na GitHubie */
+  background-color: #0d1117;
   color: #ffffff;
   display: flex;
   flex-direction: column;
@@ -75,4 +75,16 @@ input {
   margin-top: 20px;
   width: 200px;
   text-align: center;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.update-info {
+  font-size: 12px;
+  margin-top: 20px;
+  color: #8b949e;
 }
