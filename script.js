@@ -29,11 +29,12 @@ function openCase() {
   if (isAnimating) return;
 
   isAnimating = true;
-  openBtn.classList.add("hidden");
   resultP.textContent = "";
 
   const nickname = input.value.trim() || "Anonim";
 
+  openBtn.disabled = true;
+  openBtn.classList.add("hidden");
   itemsDiv.innerHTML = "";
   itemsDiv.style.transition = "none";
   itemsDiv.style.transform = "translateX(0)";
@@ -41,29 +42,26 @@ function openCase() {
   const { items, winnerIndex } = createItemsRow(nickname);
   items.forEach((el) => itemsDiv.appendChild(el));
 
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const totalWidth = items.length * 120;
-      const visibleWidth = 600;
-      let shift = -(winnerIndex * 120 - visibleWidth / 2 + 60);
-      const maxShift = -(totalWidth - visibleWidth);
+  setTimeout(() => {
+    const totalWidth = items.length * 120;
+    const visibleWidth = 600;
+    let shift = -(winnerIndex * 120 - visibleWidth / 2 + 60);
+    const maxShift = -(totalWidth - visibleWidth);
 
-      if (shift < maxShift) shift = maxShift;
-      if (shift > 0) shift = 0;
+    if (shift < maxShift) shift = maxShift;
+    if (shift > 0) shift = 0;
 
-      itemsDiv.style.transition = "transform 3s ease-out";
-      itemsDiv.style.transform = `translateX(${shift}px)`;
+    itemsDiv.style.transition = "transform 3s ease-out";
+    itemsDiv.style.transform = `translateX(${shift}px)`;
 
-      setTimeout(() => {
-        const won = items[winnerIndex]?.textContent || "nic";
-        resultP.textContent = `🎉 Wylosowano: ${won}`;
-        isAnimating = false;
-        openBtn.classList.remove("hidden");
-      }, 3100);
-    });
-  });
+    setTimeout(() => {
+      const won = items[winnerIndex]?.textContent || "nic";
+      resultP.textContent = `🎉 Wylosowano: ${won}`;
+      openBtn.disabled = false;
+      openBtn.classList.remove("hidden");
+      isAnimating = false;
+    }, 3100);
+  }, 1000); // 1s delay before animation starts
 }
 
-openBtn.addEventListener("click", () => {
-  setTimeout(openCase, 1000); // opóźnienie 1 sekunda
-});
+openBtn.addEventListener("click", openCase);
