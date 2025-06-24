@@ -24,7 +24,7 @@ function updateNickPool() {
 }
 
 function createItemsRow() {
-  const multiplier = 10;
+  const multiplier = 10; // ile razy nicki się powtarzają by zrobić animację dłuższą
   const items = [];
 
   for (let i = 0; i < nickPool.length * multiplier; i++) {
@@ -48,7 +48,7 @@ function openCase() {
   openBtn.disabled = true;
   saveBtn.disabled = true;
   resultP.textContent = "";
-  
+
   itemsDiv.style.transition = "none";
   itemsDiv.style.transform = "translateX(0)";
   itemsDiv.innerHTML = "";
@@ -60,17 +60,28 @@ function openCase() {
   const itemWidth = 120;
   const totalItems = items.length;
 
+  // Losujemy indeks zwycięzcy gdzieś na środku animacji, z marginesem aby nie było problemów z przesunięciem
   const winnerIndex = Math.floor(Math.random() * (totalItems - 10)) + 5;
-  const shift = -(winnerIndex * itemWidth - visibleWidth / 2 + itemWidth / 2);
 
+  // Obliczamy przesunięcie by wyróżnić zwycięski element na środku widoku
+  let shift = -(winnerIndex * itemWidth - visibleWidth / 2 + itemWidth / 2);
+
+  // Ograniczamy przesunięcie, by nie przesunąć za bardzo na skraj
+  const maxShift = -(totalItems * itemWidth - visibleWidth);
+  if (shift < maxShift) shift = maxShift;
+  if (shift > 0) shift = 0;
+
+  // Małe opóźnienie żeby resetować transformację (potrzebne do restartu animacji)
   setTimeout(() => {
     itemsDiv.style.transition = "none";
     itemsDiv.style.transform = "translateX(0)";
-    void itemsDiv.offsetWidth; // reflow
+    // Wymuszamy reflow, by transition zadziałał poprawnie
+    void itemsDiv.offsetWidth;
 
+    // Ustawiamy właściwą animację
     itemsDiv.style.transition = "transform 3s ease-out";
     itemsDiv.style.transform = `translateX(${shift}px)`;
-  }, 100);
+  }, 50);
 
   setTimeout(() => {
     const winner = items[winnerIndex].textContent;
@@ -78,8 +89,9 @@ function openCase() {
     isAnimating = false;
     openBtn.disabled = false;
     saveBtn.disabled = false;
-  }, 3300);
+  }, 3200);
 }
 
+// Podłączamy eventy
 saveBtn.addEventListener("click", updateNickPool);
 openBtn.addEventListener("click", openCase);
