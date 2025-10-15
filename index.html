@@ -1,28 +1,92 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CS:GO Case</title>
-  <link rel="stylesheet" href="style.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tłumacz Mangi/Manhwy</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
 </head>
 <body>
-  <h1>Otwieranie skrzynki CS:2</h1>
+    <div class="container">
+        <header>
+            <h1>Tłumacz Mangi i Manhwy</h1>
+            <p class="subtitle">Prześlij obrazek z angielskim tekstem, a my przetłumaczymy go na polski</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="upload-section">
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">📁</div>
+                    <h3>Prześlij obrazek</h3>
+                    <p>Przeciągnij i upuść lub kliknij, aby wybrać plik</p>
+                    <p class="file-types">Obsługiwane formaty: JPG, PNG, GIF</p>
+                    <input type="file" id="imageInput" accept="image/*" hidden>
+                </div>
+                <button id="translateBtn" class="translate-btn" disabled>Przetłumacz obrazek</button>
+                
+                <div class="progress-section">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                    <p id="progressText" class="progress-text">Gotowy do tłumaczenia</p>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <div class="result-container">
+                    <div class="image-container">
+                        <h3>Oryginalny obrazek</h3>
+                        <div id="originalImage" class="image-placeholder">
+                            <p>Obraz pojawi się tutaj</p>
+                        </div>
+                    </div>
+                    
+                    <div class="translation-container">
+                        <h3>Przetłumaczony tekst</h3>
+                        <div id="translationResult" class="translation-placeholder">
+                            <p>Tutaj pojawi się przetłumaczony tekst</p>
+                        </div>
+                        <div class="translation-controls">
+                            <button id="copyTextBtn" class="control-btn" disabled>Kopiuj tekst</button>
+                            <button id="editTextBtn" class="control-btn" disabled>Edytuj tekst</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="translated-image-container">
+                    <h3>Przetłumaczony obrazek</h3>
+                    <div id="translatedImage" class="image-placeholder">
+                        <p>Tutaj pojawi się obrazek z przetłumaczonym tekstem</p>
+                    </div>
+                    <div class="translation-controls">
+                        <button id="downloadBtn" class="control-btn" disabled>Pobierz obrazek</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>Jak korzystać z tłumacza?</h3>
+            <ol>
+                <li>Prześlij obrazek z mangi lub manhwy zawierający angielski tekst</li>
+                <li>Kliknij przycisk "Przetłumacz obrazek"</li>
+                <li>Poczekaj na przetworzenie obrazu i tłumaczenie</li>
+                <li>Otrzymasz przetłumaczony tekst oraz obrazek z polskim tekstem</li>
+            </ol>
+            
+            <div class="api-info">
+                <h4>Informacje o technologii</h4>
+                <p>Strona używa Tesseract.js do rozpoznawania tekstu z obrazów oraz Google Translate API do tłumaczenia.</p>
+                <p>Google Translate zapewnia wysoką jakość tłumaczenia, ale może mieć ograniczenia w przypadku bardzo długich tekstów.</p>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Tłumacz Mangi &copy; 2023 | Stworzono dla miłośników komiksów</p>
+        </footer>
+    </div>
 
-  <button id="openBtn">Otwórz skrzynkę</button>
-  <p id="result"></p>
-
-  <div class="case-container">
-    <div id="items" class="items"></div>
-    <div class="pointer"></div>
-  </div>
-
-  <div class="sidebar">
-    <h2>Wpisz nicki (jeden na linię)</h2>
-    <textarea id="nickInput" placeholder="Wpisz nicki, jeden na linię..."></textarea>
-    <button id="saveBtn">Zapisz nicki</button>
-  </div>
-
-  <script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
